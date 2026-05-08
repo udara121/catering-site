@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { background: #111; color: white; font-family: sans-serif; }
+  .video-container { display: flex; gap: 20px; }
+  video, canvas { width: 400px; }
+</style>
+</head>
+<body>
+  <h2>Original Video</h2>
+  <video id="vid" src="assets/Breakfast.mp4" autoplay loop muted playsinline></video>
+
+  <h2>Canvas Output</h2>
+  <canvas id="can"></canvas>
+  <div id="log"></div>
+
+  <script>
+    const vid = document.getElementById('vid');
+    const can = document.getElementById('can');
+    const ctx = can.getContext('2d');
+    const log = document.getElementById('log');
+
+    vid.addEventListener('loadedmetadata', () => {
+      can.width = vid.videoWidth;
+      can.height = vid.videoHeight;
+    });
+
+    function loop() {
+      if(vid.paused || vid.ended) return;
+      ctx.drawImage(vid, 0, 0, can.width, can.height);
+      try {
+        let frame = ctx.getImageData(0, 0, can.width, can.height);
+        log.innerText = "getImageData SUCCESS!";
+        // dummy process
+        ctx.putImageData(frame, 0, 0);
+      } catch(e) {
+        log.innerText = "getImageData ERROR: " + e.message;
+      }
+      requestAnimationFrame(loop);
+    }
+    vid.addEventListener('play', () => {
+      requestAnimationFrame(loop);
+    });
+  </script>
+</body>
+</html>
